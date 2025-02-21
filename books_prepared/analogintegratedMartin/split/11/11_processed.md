@@ -1,0 +1,629 @@
+# 11 Sample-and-Hold and Translinear Circuits
+
+This chapter describes some common analog building blocks other than those already presented. Specifically, circuits to realize sample-and-holds, and translinear gain cells and multipliers are discussed. A sample-and-hold $(\mathrm{S} / \mathrm{H})$ is used to sample an analog signal and to store its value for some length of time. A translinear gain cell is commonly used to create an amplifier whose gain can be adjusted through the use of a controlling input current. Finally, a translinear multiplier is realized by interconnecting two gain cells and finds a variety of uses in applications such as a modulator (in a communication system) or a phase detector (in a phase-locked loop).
+
+## 11.1 PERFORMANCE OF SAMPLE-AND-HOLD CIRCUITS
+
+An important analog building block, especially in data-converter systems, is the sample-and-hold circuit. Before proceeding, it is worthwhile to mention that sample-and-hold circuits are also often referred to as "track-and-hold" circuits. Normally, these two terms are synonymous except for a few particular switched-capacitor sample-andhold circuits that do not have a phase where the output signal is tracking the input signal. Sample-and-hold circuits are necessary components in many data-acquisition systems such as $A / D$ converters. In many cases, the use of a sample-and-hold (at the front of the data converter) can greatly minimize errors due to slightly different delay times in the internal operation of the converter.
+
+Before discussing the basic principles of sample-and-hold circuits, it is necessary to mention some performance parameters used in characterization.
+
+1. The first of these parameters is a sampling pedestal or a hold step. This is an error that occurs each time a sample-and-hold goes from sample mode to hold mode. During this change in operation, there is always a small error in the voltage being held that makes it different from the input voltage at the time of sampling. Obviously, this error should be as small as possible. Perhaps more importantly, this error should be signal independent; otherwise it can introduce nonlinear distortion.
+2. Another parameter is a measure of how isolated the sampled signal is from the input signal during hold mode. Ideally, the output voltage will no longer be affected by changes in the input voltage. In reality, there is always some signal feedthrough, usually through parasitic capacitive coupling from the input to the output. In well-designed sample-and-holds, this signal feedthrough can be greatly minimized.
+3. A third important parameter is the speed at which a sample-and-hold can track an input signal, when in sample mode. In this mode, a sample-and-hold will have both small-signal and large-signal limitations due to its $-3-\mathrm{dB}$ bandwidth and finite slew rate, respectively. Both the $-3-\mathrm{dB}$ bandwidth and slew rate should be maximized for high-speed operation.
+4. Yet another limitation (somewhat less important in high-speed designs) is the droop rate in hold mode. This error is a slow change in output voltage, when in hold mode, caused by effects such as leakage
+currents due to the finite base currents of bipolar transistors and reverse-biased junctions. In most CMOS designs, this droop rate is so small it can often be ignored.
+5. A fifth limitation is aperture jitter or aperture uncertainty. This error is the result of the effective sampling time changing from one sampling instance to the next and becomes more pronounced for high-speed signals. Specifically, when high-speed signals are being sampled, the input signal changes rapidly, resulting in small amounts of aperture uncertainty causing the held voltage to be significantly different from the ideal held voltage.
+
+Other performance parameters are also important when realizing sample-and-holds. These include parameters such as dynamic range, linearity, gain, and offset error. Some of the mechanisms whereby these errors arise in particular sample-and-holds are described in the next section using specific $\mathrm{S} / \mathrm{H}$ examples. In addition, a number of design principles whereby these errors can be minimized are explained.
+
+Key Point: In addition to usual analog performance metrics such as dynamic range, linearity, etc., sample-and-hold circuits exhibit other nonidealities typically characterized in terms of their sampling pedestal, input isolation, tracking bandwidth, slew rate, droop rate, and aperture uncertainty.
+
+### 11.1.1 Testing Sample-and-Holds
+
+Before describing various $\mathrm{S} / \mathrm{H}$ architectures, it is appropriate to first describe a popular method for testing $\mathrm{S} / \mathrm{Hs}$, referred to as the beat test. This test consists of clocking the $\mathrm{S} / \mathrm{H}$ at its maximum clock frequency and applying a sinusoidal input signal that has a frequency slightly different than the clock frequency. ${ }^{1}$ The output of this system is demodulated to a low frequency equal to the difference between the frequency of the clock signal and that of the input signal. This low-frequency signal is then characterized using a spectrum analyzer or by digitizing it using a
+
+Key Point: The beat test allows a sample-and-hold (or A/D converter) to be characterized at its maximum clock frequency while monitoring only a relatively low-frequency output signal.
+high-accuracy A/D converter clocked at the difference frequency and then analyzed using a computer. The test setup for a beat test is shown in Fig. 11.1. Example waveforms for the input signal, the sampling signal, and the output signal of the sample-and-hold are shown in Fig. 11.2. Note that this test allows a S/H to be characterized while operating at its maximum clock frequency, yet only a relatively low-frequency output signal must be monitored.
+image_name:Fig. 11.1
+description:The system block diagram in Fig. 11.1 illustrates a test setup for characterizing a sample-and-hold (S/H) circuit using a beat test. The main components of this setup include:
+
+1. **Input Signal (Vin):** The input to the system is a sinusoidal signal defined by the equation \( V_{in} = A_{in} \sin[2\pi(f_{smpl} + \Delta f)t] \). This indicates that the input signal has a frequency component \( f_{smpl} + \Delta f \), where \( f_{smpl} \) is the sampling frequency and \( \Delta f \) is the difference frequency.
+
+2. **Sample-and-Hold Circuit (S/H):** The core component is the S/H block, which samples the input signal. It is controlled by a clock signal (Clk) with a sampling frequency \( f_{smpl} \). The clock signal \( \phi_{smpl} \) is responsible for the timing of the sampling process.
+
+3. **Output Signal:** The output from the S/H circuit is an analog signal at the difference frequency \( \Delta f \). This output is then directed to two different analysis components.
+
+4. **Spectrum Analyzer:** One path of the output signal is sent to a spectrum analyzer. This device analyzes the frequency components of the output signal, allowing for examination of the beat frequency \( \Delta f \).
+
+5. **A/D Converter and Computer:** The other path of the output signal is sent to an analog-to-digital converter (A/D) and computer system. This setup digitizes the output signal for further analysis and processing using computational tools.
+
+**Flow of Information:**
+- The input sinusoidal signal \( V_{in} \) enters the S/H block, where it is sampled based on the clock signal \( \phi_{smpl} \).
+- The sampled signal, now at frequency \( \Delta f \), is split and sent to both the spectrum analyzer and the A/D converter for analysis.
+
+**Overall System Function:**
+The primary function of this setup is to characterize the performance of the sample-and-hold circuit by analyzing its output at a specific beat frequency. This allows for high-accuracy measurements of the S/H performance while operating at maximum clock frequency, by simplifying the monitoring to a lower frequency output.
+
+Fig. 11.1 The test setup for characterizing a sample-and-hold using a beat test.
+
+1. If the circuit being tested is, in fact, a track and hold, then the output of the track and hold would be resampled by a second track and hold clocked on the opposite phase as the original.
+image_name:Fig. 11.2
+description:The graph in Fig. 11.2 is a time-domain waveform illustration showing the behavior of a sample-and-hold circuit. It features two waveforms: the input signal and the output signal of the sample-and-hold.
+
+1. **Type of Graph and Function:**
+- The graph is a time-domain waveform plot.
+
+2. **Axes Labels and Units:**
+- The axes are not explicitly labeled, but it can be inferred that the horizontal axis represents time and the vertical axis represents signal amplitude (voltage).
+- The scale appears to be linear, with no specific units or markers indicated.
+
+3. **Overall Behavior and Trends:**
+- The input signal is a continuous sinusoidal wave, shown as a smooth curve with regular peaks and troughs.
+- The output signal of the sample-and-hold is depicted as a stepped waveform. It holds the sampled values of the input signal at regular intervals, creating a staircase-like pattern.
+- The output remains constant between sampling points, reflecting the hold phase of the sample-and-hold operation.
+
+4. **Key Features and Technical Details:**
+- The input signal oscillates smoothly, indicating a continuous sinusoidal function.
+- The output signal captures and holds the peak values of the input signal at specific intervals, demonstrating the sample-and-hold effect.
+- Key features include the points where the output waveform transitions between held values, coinciding with the peaks of the input sinusoid.
+
+5. **Annotations and Specific Data Points:**
+- The graph includes annotations labeling the 'Input signal' and 'Output signal of sample-and-hold.'
+- There are no numerical values or specific data points marked on the graph.
+
+Overall, the graph effectively demonstrates how a sample-and-hold circuit samples a continuous input signal and produces a discrete output by holding sampled values over time.
+
+Sampling signal
+Fig. 11.2 Example waveforms for the test setup of Fig. 11.1.
+
+If a computer is used for analysis, the signal would normally be curve-fitted to a sinusoidal wave at the beat (i.e., difference) frequency. This ideal closest-fit sinusoid would then be subtracted from the measured signal, and the error signal would be analyzed for RMS content and spectral components using a fast-Fourier transform.
+
+It might be mentioned that a very similar test setup can be used for analog-to-digital converters, in which case the output of the $\mathrm{A} / \mathrm{D}$ converter would be digitally loaded into a computer for analysis.
+
+## 11.2 MOS SAMPLE-AND-HOLD BASICS
+
+image_name:Fig. 11.3 An open-loop track and hold realized using MOS technology.
+description:
+[
+name: M1, type: NMOS, ports: {S: V, D: "Vin", G: ϕclk}
+name: C_hld, type: Capacitor, value: C_hld, ports: {Np: "V", Nn: GND}
+name: 1, type: buffer, value: 1, ports: {InP: "V", Out: Vout'}
+]
+extrainfo:The circuit is a CMOS open-loop track and hold circuit. When the clock signal ϕclk is high, the input voltage Vin is tracked. When ϕclk goes low, the voltage is held on the capacitor Chld.
+
+Fig. 11.3 An open-loop track and ho id realized using MOS technology.
+
+Perhaps the simplest sample-and-hold that can be realized using a CMOS technology is shown in Fig. 11.3. When $\phi_{\text {cIk }}$ is high, $\mathrm{V}^{\prime}$ follows $\mathrm{V}_{\mathrm{in}}$. When $\phi_{\mathrm{clk}}$ goes low, $\mathrm{V}^{\prime}$ will ideally stay constant from then on, having a value equal to $\mathrm{V}_{\mathrm{in}}$ at the instance $\phi_{\text {clk }}$ went low. Unfortunately, $\mathrm{V}^{\prime}$ will have a negative going hold step at this time caused by the channel charge of $Q_{1}$. When $Q_{1}$ turns off, its channel charge must flow out from under its gate into its junctions. Since this charge is negative, it will cause the junction voltages to have negative glitches. If one assumes the source impedance at the node $\mathrm{V}_{\text {in }}$ is very low, then the glitch at this node will be small and have a very short duration. However, the negative charge that goes to the node with $\mathrm{C}_{\text {hld }}$ connected to it (i.e., node $\mathrm{V}^{\prime}$ ) will cause a negative voltage change that is long lasting (until the next time $Q_{1}$ turns on again). If clock $\phi_{c \mid k}$ turns off fast, then the channel charge, $\mathrm{Q}_{\mathrm{CH}}$, will flow equally into both junctions [Shieh, 1987] since the channel becomes pinched off at both ends (i.e., next to the junctions) while the charge is flowing out to the two junctions. The charge flowing to the junction labelled $\mathrm{V}^{\prime}$ is therefore given by
+
+$$
+\begin{equation*}
+\Delta Q_{C_{\text {hld }}}=\frac{Q_{C H}}{2}=\frac{C_{o x} W L V_{\text {eff-1 }}}{2} \tag{11.1}
+\end{equation*}
+$$
+
+where $\mathrm{V}_{\text {eff-1 }}$ is given by
+
+$$
+\begin{equation*}
+V_{\text {eff-1 }}=V_{\mathrm{GS} 1}-V_{\mathrm{tn}}=V_{D D}-V_{\mathrm{tn}}-V_{\mathrm{in}} \tag{11.2}
+\end{equation*}
+$$
+
+Here, $\mathrm{V}_{\mathrm{in}}$ is the input voltage at the instance $\mathrm{Q}_{1}$ turns off. It should be noted here that this result assumes that the clock signal, $\phi_{\mathrm{cl}}$, goes between $\mathrm{V}_{\mathrm{DD}}$ and the most negative voltage in the circuit.
+
+The change in the voltage $\mathrm{V}^{\prime}$ is found by using the relationship $\mathrm{Q}=\mathrm{CV}$, resulting in
+
+$$
+\begin{equation*}
+\Delta \mathrm{V}^{\prime}=\frac{\Delta \mathrm{Q}_{\mathrm{C} \text {-hld }}}{\mathrm{C}_{\text {hld }}}=-\frac{\mathrm{C}_{\mathrm{ox}} \mathrm{WLV}_{\text {eff-1 }}}{2 \mathrm{C}_{\text {hld }}}=-\frac{\mathrm{C}_{0 \mathrm{x}} \mathrm{WL}\left(\mathrm{~V}_{\mathrm{DD}}-\mathrm{V}_{\mathrm{tn}}-\mathrm{V}_{\text {in }}\right)}{2 \mathrm{C}_{\text {hld }}} \tag{11.3}
+\end{equation*}
+$$
+
+Notice that $\Delta \mathrm{V}^{\prime}$ is linearly related to $\mathrm{V}_{\mathrm{in}}$, which results in a gain error for the overall sample-and-hold circuit. However, more importantly, $\Delta \mathrm{V}^{\prime}$ is also linearly related to $\mathrm{V}_{\mathrm{tn}}$, which is nonlinearly related to the input signal, $\mathrm{V}_{\mathrm{in}}$, due to variations in the source-substrate voltage triggering a body effect (assuming the substrate is tied to one of the voltage rails). This nonlinear relationship with $\mathrm{V}_{\text {in }}$ results in distortion for
+
+Key Point: Charge injection causes a hold step that is nonlinearly related to the input signal, resulting in signal distortion.
+the overall sample-and-hold circuit.
+
+There is also an additional change in $\mathrm{V}^{\prime}$ due to the gate overlap capacitance. Using a derivation similar to that used to find (10.8), we have
+
+$$
+\begin{equation*}
+\Delta \mathrm{V}^{\prime} \cong-\frac{\mathrm{C}_{\mathrm{ox}} \mathrm{WL}_{\mathrm{ov}}\left(\mathrm{~V}_{\mathrm{DD}}-\mathrm{V}_{\mathrm{Ss}}\right)}{\mathrm{C}_{\mathrm{hld}}} \tag{11.4}
+\end{equation*}
+$$
+
+where $\mathrm{V}_{\mathrm{Ss}}$ is the most negative voltage in the circuit. This component is usually smaller than that due to the channel charge, and appears simply as an offset since it is signal independent. Therefore, this error component is not typically important since signal-independent offsets can often be removed in most systems. However, it may cause noise problems if care is not taken to ensure that the clock signal, $\phi_{\mathrm{cl}}$, is relatively noise free. For example, if the clock signal has power-supply noise on it due to being realized with a simple inverter tied to digital power supplies, the power-supply rejection ratio of this circuit might be poor.
+
+#### EXAMPLE 11.1
+
+Consider the sample-and-hold of Fig. 11.3 with $\mathrm{C}_{\mathrm{hld}}=1 \mathrm{pF}, \mathrm{C}_{\mathrm{ox}}=8.5 \mathrm{fF} /(\mu \mathrm{m})^{2}, \mathrm{~V}_{\mathrm{tn}}=0.45 \mathrm{~V}$, and $(\mathrm{W} / \mathrm{L})_{1}=(5 \mu \mathrm{~m} / 0.4 \mu \mathrm{~m})$. Assume the power supply voltage is 2 V . Find the hold step for $\mathrm{V}_{\mathrm{in}}$ equal to 1 V , and then repeat for $\mathrm{V}_{\text {in }}$ equal to 0.5 V . Use these estimates for errors to estimate the dc offset.
+
+#### Solution
+
+At $\mathrm{V}_{\text {in }}=1 \mathrm{~V}$, using (11.3), we find $\Delta \mathrm{V}^{\prime}(1 \mathrm{~V})=-4.7 \mathrm{mV}$. At $\mathrm{V}_{\mathrm{in}}=0.5 \mathrm{~V}$, again using (11.3), we find $\Delta \mathrm{V}^{\prime}(0.5 \mathrm{~V})=-8.9 \mathrm{mV}$. The average offset is given by
+
+$$
+\begin{equation*}
+\mathrm{V}_{\text {offset-avg }}=\frac{\Delta \mathrm{V}^{\prime}(1 \mathrm{~V})+\Delta \mathrm{V}^{\prime}(0.5 \mathrm{~V})}{2}=-6.8 \mathrm{mV} \tag{11.5}
+\end{equation*}
+$$
+
+which is a reasonable estimate of the amount of dc offset injected in this example.
+
+There have been a number of changes proposed to minimize the signal-dependent hold step. One approach is to replace the $n$-channel switch by a CMOS transmission gate, as shown in Fig. 11.4. The idea behind this approach is that if the size of the p -channel transistor is taken the same as the n -channel transistor, then the charge injection due to each transistor will cancel when the transmission gate turns off. This result is somewhat true when $\mathrm{V}_{\text {in }}$ is in the middle region between the power supplies, assuming the clock waveforms are fast and
+exactly complementary. Unfortunately, these conditions are seldom possible to achieve in practice. When the finite slopes of the clock waveforms are taken into account, it is seen (as is explained shortly) that the turn-off times of the transistors are signal dependent and this signal dependence causes the n -channel transistor to turn off at different times than the p -channel transistor. Even if we ignore the errors caused by imperfect clock waveforms, when $\mathrm{V}_{\text {in }}$ is closer to $\mathrm{V}_{\mathrm{DD}}$, the charge from the p -channel transistor is greater than that from the n -channel transistor because of its larger effective gate-source voltage resulting in a positive hold step. The opposite happens when the input signal is closer to the negative power supply. Seldom will these two effects have the same magnitude in practice.
+image_name:Fig. 11.4
+description:
+[
+name: Q1, type: NMOS, ports: {S: V, D: "Vin", G: ϕclk}
+name: Q2, type: PMOS, ports: {S: V, D: "Vin", G: ϕclk_bar}
+name: C_hld, type: Capacitor, value: C_hld, ports: {Np: "V", Nn: GND}
+name: 1, type: buffer, value: 1, ports: {InP: "V", Out: Vout}
+]
+extrainfo:The circuit is an open-loop track and hold circuit using a CMOS transmission gate, consisting of NMOS and PMOS transistors controlled by a clock signal (clk). The output is buffered by an op-amp.
+
+Fig. 11.4 An open-loop track and hold realized using a CMOS transmission gate.
+
+Another modification, often proposed to minimize clockfeedthrough errors, is to add a dummy switch as shown in Fig. 11.5 [McCreary, 1975]. The theory behind this technique is that if the width of $Q_{2}$ is taken exactly one-half that of $Q_{1}$, and if the clock waveforms are fast, then the charges will cancel. In practice, it is seldom possible to have the clock waveforms change fast enough so that the ideal ratio of widths is exactly onehalf. When the ideal ratio is not one-half, it is difficult to make the ratio equal to the optimum required for perfect cancellation. However, when the clock waveforms are fast, this technique usually can minimize the hold pedestal to less than about one-fifth the value it would have without it. For this to be the case, however, it is necessary that the clock of $Q_{2}$ changes slightly after that of $Q_{1}$. This clock arrangement guarantees that the cancelling charge of $Q_{2}$ cannot escape through $Q_{1}$ while it is still on.
+
+Key Point: The effective sampling time is related to the input signal due to the finite riselfall time of the clock, another nonideality.
+
+Another source of error for the simple sample-and-hold of Fig. 11.3 is caused by clock waveforms having finite slopes. To understand this error source consider the waveforms for $\mathrm{V}_{\text {in }}$ and $\phi_{\text {clk }}$ shown in Fig. 11.6. Assume the ideal sampling time is defined to be the negative-going zerocrossing of $\phi_{\text {clk }}$. The true sampling time is that when the sampling-clock voltage passes through the value when it is one transistor threshold voltage drop above the input voltage. In other words, transistor $Q_{1}$ of Fig. 11.3 turns off when $\phi_{\mathrm{clk}}$ is $V_{\mathrm{tn}}$ above $V_{\mathrm{in}}$, as shown in Fig. 11.6. Thus, when $\mathrm{V}_{\text {in }}$ is high, the true sampling time is earlier than the ideal sampling time, whereas when $\mathrm{V}_{\text {in }}$ is low 0 V , the true sampling time is late.
+image_name:Fig. 11.5
+description:
+[
+name: Q1, type: NMOS, ports: {S: V, D: Vin, G: ϕclk}
+name: Q2, type: NMOS, ports: {S: V'', D: "V", G: ϕclk_bar}
+name: C_hld, type: Capacitor, value: C_hld, ports: {Np: "V", Nn: GND}
+name: 1, type: buffer, value: 1, ports: {InP: "V",Out: Vout}
+]
+extrainfo:The circuit is an open-loop track and hold circuit using an n-channel switch Q1 and a dummy switch Q2 for clock-feedthrough cancellation. The capacitor Chld holds the sampled voltage which is then buffered by an OpAmp.
+
+Fig. 11.5 An open-loop track and hold realized using an n -channel switch a long with a dumm y switch for clock-feedthrough cancellation. The size of $Q_{2}$ is one-half that of $Q_{1}$.
+image_name:Fig. 11.6
+description:The graph in Fig. 11.6 illustrates the clock waveforms for $V_{\text{in}}$ and $\phi_{\text{clk}}$, demonstrating the effect of finite slope in the sampling clock on sampling-time jitter. This is a time-domain waveform graph.
+
+**Axes Labels and Units:**
+- The horizontal axis represents time, although specific units are not labeled on the graph.
+- The vertical axis represents voltage for both the input signal $V_{\text{in}}$ and the clock signal $\phi_{\text{clk}}$.
+
+**Overall Behavior and Trends:**
+- The input signal $V_{\text{in}}$ is shown as a smooth sinusoidal waveform.
+- The clock signal $\phi_{\text{clk}}$ is depicted as a square wave with finite rise and fall times, resulting in a non-instantaneous transition between high and low states.
+- The graph highlights the deviation between ideal and actual sampling times due to the finite slope of the clock signal.
+
+**Key Features and Technical Details:**
+- The ideal sampling times ($t_{s1\text{-ideal}}$ and $t_{s2\text{-ideal}}$) are marked where the clock transitions would ideally occur.
+- The actual sampling times ($t_{s1\text{-actual}}$ and $t_{s2\text{-actual}}$) are shown as deviating from the ideal times due to the finite slope, indicating the presence of sampling jitter.
+- The difference between ideal and actual sampling times is labeled as "Sampling jitter."
+
+**Annotations and Specific Data Points:**
+- The graph is annotated with dashed lines indicating the ideal and actual sampling times, emphasizing the impact of the clock's finite slope on sampling precision.
+- The voltage levels and specific time deviations are not numerically specified but are qualitatively illustrated to show the effect of clock slope on timing accuracy.
+
+Fig. 11.6 The clock waveforms for $V_{\text {in }}$ and $\phi_{\text {clk }}$ used to illus trate how a finite slop e for the sa mpling clock introduces sampling-time jitter.
+
+#### EXAMPLE 11.2
+
+Consider the $\mathrm{S} / \mathrm{H}$ circuit of Fig. 11.3, where $\mathrm{V}_{\mathrm{in}}$ is a $20-\mathrm{MHz}$ band-limited signal with a $2-\mathrm{V}_{\mathrm{pp}}$ amplitude. Assume that $\phi_{\mathrm{clk}}$ is a $100-\mathrm{MHz}$ square wave having a peak amplitude of $\pm 2.5 \mathrm{~V}$ with linear rise and fall times of 1.5 ns . What is the maximum uncertainty of the sampling time? Assume $\mathrm{V}_{\mathrm{tn}}$ is 0.8 V .
+
+#### Solution
+
+First, we note that the slope of $\phi_{\mathrm{clk}}$ is $(5 \mathrm{~V}) /(1.5 \mathrm{~ns})=3.33 \mathrm{~V} / \mathrm{ns}$, and the true sampling time is when the clock waveform is 0.8 V greater than the input signal.
+
+For $\mathrm{V}_{\text {in }}$ equal to 1 V , the sampling transistor will turn off when $\phi_{\mathrm{clk}}$ is 1.8 V , which is $(0.7 \mathrm{~V}) /(3.33 \mathrm{~V} / \mathrm{ns})=0.21 \mathrm{~ns}$ after the clock first starts to move down.
+
+When $\mathrm{V}_{\text {in }}$ is -1 V , the sampling time occurs when $\phi_{\mathrm{clk}}$ is -0.2 V , which is 0.81 ns after the clock first starts to move upward.
+
+Therefore, the sampling-time uncertainty is $0.81-0.21=0.6 \mathrm{~ns}$. Also, assuming the ideal sampling time is 0.75 ns after the clock first starts to move, the sampling jitter is from -0.54 ns to +0.06 ns from the ideal sampling time.
+
+A more elaborate sample-and-hold circuit is to include an opamp in a feedback loop, as shown in Fig. 11.7. When the clock, $\phi_{\text {clk }}$, is high, the complete circuit responds similarly to an opamp in a unity-gain feedback configuration. When $\phi_{\text {clk }}$ goes low, the input voltage at that time is stored on $\mathrm{C}_{\text {hld }}$, similarly to a simple sample-and-hold. By including an opamp in the feedback loop, the input impedance of the sample-and-hold is greatly increased. Another advantage of this configuration is that even if the unity-gain buffer at the output has
+
+Key Point: The use of opamps and feedback can provide several performance advantages in S/H circuits, although stability requirements generally limit their speed to less than that of open-loop S/H circuits.
+an offset voltage, the dc error due to this buffer will be divided by the gain of the input opamp (although the input-offset of the input opamp will remain). Thus, very simple source followers can be used for the output buffer.
+image_name:Fig. 11.7
+description:
+[
+name: A1, type: OpAmp, value: A1, ports: {InP: Vin, InN: Vout, OutP: Out(A1)}
+name: Q1, type: NMOS, ports: {S: Out(A1), D: In(1), G: ϕclk}
+name: C_hld, type: Capacitor, value: C_hld, ports: {Np: In(1), Nn: GND}
+name: 1, type: OpAmp, value: 1, ports: {InP: In(1),OutP: Vout}
+]
+extrainfo:The circuit is a sample-and-hold configuration using an op-amp in a feedback loop to increase input impedance. The NMOS transistor is used as a switch controlled by a clock signal (Clk). The circuit includes a holding capacitor (Chld) to store the sampled voltage.
+
+Fig. 11.7 Including an opamp in a feedback loop of a sample-and-hold to increase the input impedance.
+
+A disadvantage of the configuration shown is that the speed of operation can be seriously degraded due to the necessity of guaranteeing that the loop is stable when it is closed. Another source of speed degradation is that when in hold mode, the opamp is open loop, resulting in its output almost certainly saturating at one of the powersupply voltages. When the sample-and-hold next goes back into track mode, it will take some time for the opamp output voltage to slew back to its correct closed-loop value. This slewing time can be greatly minimized by adding two additional transistors as shown in Fig. 11.8. During hold mode, switch $Q_{2}$ keeps the output of the first opamp close to the voltage it will need to be at when the T/H goes into track mode. It should also be noted that this track-and-hold configuration still has errors due to charge injection from the switch, $\mathrm{Q}_{1}$, similar to the simple $\mathrm{S} / \mathrm{H}$ of Fig. 11.3. The errors due to finite clock rise and fall times are also similar.
+
+A similar, but improved, configuration is shown in Fig. 11.9 [Stafford, 1974; Lim, 1991]. In this configuration, the holding capacitor is not going to ground, but rather is placed in the feedback path of a second opamp. This configuration has a number of desirable features. Perhaps the most important of these is due to the fact that, assuming the second opamp has a large gain, the voltages on both sides of switch $Q_{1}$ are very nearly signal independent. Thus, when $Q_{1}$ turns off, there will still be charge injection to the left side of $\mathrm{C}_{\text {hld }}$, which will cause the output voltage of opamp 2 to have a positive hold step, but this hold step will be just a dc offset and will be signal independent. In other words, the charge injection due to $Q_{1}$ will cause some dc offset but no distortion. In addition, the sampling time will not change because of the finite slopes of the sampling-clock waveform.
+image_name:Fig. 11.8 Adding an additional switch to the S/H of Fig. 11.7 to minimize slewing time.
+description:
+[
+name: Q1, type: NMOS, ports: {S: Out(A1), D: In(1), G: ϕclk}
+name: Q2, type: NMOS, ports: {S: InN(A1), D: Out(A1), G: ϕclk_bar}
+name: Q3, type: NMOS, ports: {S: InN(A1), D: Vout, G: ϕclk}
+name: A1, type: OpAmp, value: A1, ports: {InP: Vin, InN: InN(A1), OutP: Out(A1)}
+name: C_hld, type: Capacitor, value: C_hld, ports: {Np: In(I1), Nn: GND}
+name: 1, type: OpAmp, value: 1, ports: {InP: In(1), OutP: Vout}
+]
+extrainfo:The circuit is a sample-and-hold (S/H) configuration with an additional switch to minimize slewing time. It includes three NMOS transistors (Q1, Q2, Q3) and two operational amplifiers. Q1 is used for sampling, while Q2 and Q3 are used for grounding and switching purposes. The capacitor C_hld holds the sampled voltage. The clock signals clk and clk_bar control the switching actions. The output is taken from the second opamp.
+
+Fig. 11.8 Adding an additional switch to the S/H of Fig. 11.7 to minimize slewing time.
+image_name:Fig. 11.8
+description:
+[
+name: A1, type: OpAmp, value: A1, ports: {InP: InP(A1), InN: Vin, OutP: Out(A1)}
+name: A2, type: OpAmp, value: A2, ports: {InP: GND, InN: InN(A2), Out: Vout}
+name: Q1, type: NMOS, ports: {S: Out(A1), D: InN(A2), G: ϕclk}
+name: Q2, type: NMOS, ports: {S: GND, D: Out(A1), G: ϕclk_bar}
+name: C_hld, type: Capacitor, value: C_hld, ports: {Np: InN(A2), Nn: Vout}
+]
+extrainfo:The circuit is a sample-and-hold configuration with two operational amplifiers and three NMOS transistors. Q1 is used for sampling, while Q2 is used for grounding during the hold mode. The capacitor Chld holds the sampled voltage, and the output is taken from the second opamp. The clock signals clk and clk_bar control the switching actions.
+
+Fig. 11.9 An improved configuration for an S/H as compared to that of Fig. 11.8.
+
+Another advantage is due to the inclusion of $Q_{2}$. This switch grounds the output of the first opamp during hold mode. (If the supply voltage is unipolar, the source of $\mathrm{Q}_{2}$ should instead be connected to a mid-rail dc voltage, as should the positive terminal of Opamp 2.) This grounding keeps the output of the first opamp close to the voltage it must change to when the $\mathrm{S} / \mathrm{H}$ goes back into track mode. This approach greatly speeds up the time it takes the $\mathrm{S} / \mathrm{H}$ to return to track mode. The switch also greatly minimizes signal feedthrough when the $\mathrm{S} / \mathrm{H}$ is in hold mode by grounding the signal path.
+
+A major limitation of this configuration is that the speed will be degraded because of the necessity to guarantee stability in the track mode. This limitation is worsened since there are now two opamps in the loop along with the on resistance of the sampling switch, $\mathrm{Q}_{1}$, during the closed-loop phase.
+
+Figure 11.10 shows an interesting modification of Fig. 11.9 by including some additional circuitry intended to minimize the hold pedestal and thereby minimize the dc offset [Martin, 1987; Nayebi, 1989]. The basic idea is to match the charge injection into $\mathrm{C}_{\text {hld }}$ with a similar charge injection into $\mathrm{C}_{\text {hld }}^{\prime}$. Since these capacitors are chosen to have the same size, their voltage changes will match, and the common-mode rejection of the opamp will eliminate the effects of these voltage changes on the output voltage of the $\mathrm{S} / \mathrm{H}$. The major limitation of this approach is a second-order effect caused by a mismatch in impedance levels at the left of $\mathrm{Q}_{1}$ and the bottom of $\mathrm{Q}_{2}$. Errors due to this mismatch can be minimized by including small capacitors ( 0.5 pF to 1 pF ) between each node and ground. These extra capacitors help keep these nodes at constant voltages while the clocks are turning off, assuming the clock waveforms are fast. It should be mentioned that the configuration of [Nayebi, 1989] was a fully differential design and is a very reasonable choice for many S/H applications.
+image_name:Fig. 11.10 An S/H similar to that of Fig. 11.9, but with clock-feedthrough cancellation circuitry added.
+description:The circuit is a sample-and-hold (S/H) circuit with clock-feedthrough cancellation circuitry. It uses two operational amplifiers (A1 and A2) and three NMOS transistors (Q1, Q2, Q3) to manage the sampling and holding of the input signal Vin. Capacitors Chld and Chld' are used to stabilize the voltages at key nodes.
+
+Fig. 11.10 An S/H similar to that of Fig. 11.9, but with clock-feedthrough cancellation circuitry added.
+
+## 11.3 EXAMPLES OF CMOS S/H CIRCUITS
+
+image_name:Fig. 11.10
+description:
+[
+name: Q1, type: NMOS, ports: {S: X, D: InN(A1), G: ϕclk}
+name: Q2, type: NMOS, ports: {S: GND, D: X, G: ϕclk_bar}
+name: R1, type: Resistor, value: R, ports: {N1: Vin, N2: X}
+name: R2, type: Resistor, value: R, ports: {N1: X, N2: Vout}
+name: C, type: Capacitor, value: C, ports: {Np: InN(A1), Nn: Vout}
+name: A1, type: OpAmp, value: A1, ports: {InP: GND, InN: InN(A1), OutP: Vout}
+]
+extrainfo:The circuit is a sample-and-hold (S/H) circuit with clock-feedthrough cancellation circuitry. It uses two NMOS transistors (Q1 and Q2) to manage the sampling and holding of the input signal Vin. The operational amplifier (A1) stabilizes the output voltage. Resistors and capacitors are used to control the timing and stability of the circuit.
+
+Fig. 11.11 An inverting track and hold.
+image_name:Fig. 11.12 A simple noninverting sample-and-hold with clock-feedthrough cancellation.
+description:
+[
+name: Q1, type: NMOS, ports: {S: Vin, D: InP(A1), G: ϕclk}
+name: Q2, type: NMOS, ports: {S: Vout, D: InN(A1), G: ϕclk}
+name: C1, type: Capacitor, value: C1, ports: {Np: InP(A1), Nn: GND}
+name: C2, type: Capacitor, value: C2, ports: {Np: InN(A1), Nn: Vout}
+name: A1, type: OpAmp, value: A1, ports: {InP: InP(A1), InN: InN(A1), OutP: Vout}
+]
+extrainfo:The circuit is a noninverting sample-and-hold circuit with clock-feedthrough cancellation. NMOS transistors Q1 and Q2 are used for sampling and holding, controlled by the clock signal ϕclk. Capacitors C1 and C2 are used for stability and timing control. The operational amplifier A1 stabilizes the output voltage.
+
+Fig. 11.12 A simple noninverting sample-and-hold with clock-feedthrough cancellation.
+
+In this section, a number of CMOS S/H circuits are described. The optimum choice for a sample-andhold circuit is highly dependent on the application's requirements and the technology available. Therefore, choosing the best circuit is nontrivial and a matter of ongoing research. For these reasons, it is difficult to definitively state which configurations are superior or inferior.
+
+Before proceeding, it should be noted that many of these circuits could also be realized in a BiCMOS technology, where a speed advantage would be obtained by increasing the unity-gain frequency of any opamps used. For even higher speeds, a BiCMOS circuit can make use of a bipolar diode bridge, as described in Section 11.4.
+
+The S/H circuit shown in Fig. 11.11 [Ishikawa, 1988] is intended to operate at high speeds, assuming a high-speed opamp capable of driving resistive loads is available. Unfortunately, in CMOS technologies, such opamps are difficult to obtain. Furthermore, the required output buffer would not only limit speed, but could also limit the signal swing. In bipolar and BiCMOS technologies, this configuration could be a very viable alternative. When in track mode, $Q_{1}$ is on and $Q_{2}$ is off, resulting in the sample-and-hold acting as an inverting low-pass circuit having a $-3-\mathrm{dB}$ frequency given by $\omega_{-3 \mathrm{~dB}}=1 /(\mathrm{RC})$. When $Q_{1}$ turns off, the output voltage will remain constant from then on. Since the junctions of $Q_{1}$ are always at voltages very close to ground, the clock feedthrough of this sample-and-hold is signal independent. Also, finite clock rise and fall times do not make the sampling time a function of the signal, either. The function of $Q_{2}$ is to minimize signal feedthrough when in hold mode and to keep the common node of the resistive network close to the voltage required when the S/H goes back into track mode. In the implementation described in [Ishikawa, 1988], an additional small bypass capacitor was included in parallel to the input resistor. It was reported, and supported by analysis, that this capacitor improved the speed of the $\mathrm{S} / \mathrm{H}$.
+
+Another alternative is shown in Fig. 11.12 [Sone, 1993]. This track-and-hold places the opamp into a unitygain follower during track mode. Also, the positive input terminal of the opamp is connected to $\mathrm{V}_{\text {in }}$ at this time. When the $T / H$ goes into hold mode, the input signal is stored across $C_{1}$, since $Q_{1}$ is turned off. At the same time, transistor $Q_{2}$ is also turned off. Ideally, the charge feedthrough from $Q_{1}$, although signal dependent, will be matched by the charge feedthrough from $Q_{2}$, since both are at the same voltage and have the same clock waveforms. For this to be true, the opamp must have a low-impedance output. ${ }^{2}$ Furthermore, the signal dependence of the clock signals can be minimized by having clock signals that change above and below the input signal by fixed
+2. This can be partially realized using a high-output impedance OTA by having a load capacitor connected to ground, but without having a resistor included in series with the load capacitor (as would be required if lead compensation was desired).
+amounts. As will be seen in the next section, this is not too difficult to realize using diode clamps in a bipolar or BiCMOS technology. In a CMOS technology, it is more difficult. Regardless, the topology of Fig. 11.12 is attractive for high-speed CMOS applications that are not too demanding.
+
+Yet another S/H architecture is shown in Fig. 11.13 [Lim, 1991]. Shown in Fig. 11.14(a) is the circuit configuration when the S/H is in sample mode. During this mode, the opamp is being reset, and both capacitors are connected between the input voltage and the virtual input of the opamp. Thus the total capacitance that needs to be charged or discharged during this mode is $\mathrm{C}_{1}+\mathrm{C}_{2}$. During hold mode, the configuration is as shown in Fig. 11.14(b). During this mode, the effective hold capacitor is the Miller capacitor given by
+
+$$
+\begin{equation*}
+C_{\text {hld-eff }}=(1+A)\left(\frac{C_{1} C_{2}}{C_{1}+C_{2}}\right) \tag{11.6}
+\end{equation*}
+$$
+
+which is typically much larger than the capacitance that needs to be charged during the sampling mode. This allows smaller capacitances and therefore smaller switches to be used than would otherwise be the case. Since the voltage changes at the output of the amplifier are very small, it is easy to design the amplifier for very high speed. The sampling switch, $Q_{1}$, does inject signal-dependent charge as in other open-loop architectures, but again this is minimized by the large size of the Miller hold capacitance, especially if $Q_{2}$ is turned off slightly before $\mathrm{Q}_{1}$.
+
+At lower frequencies, there are a number of sample-and-hold architectures based on switched-capacitor technology that are often used. These $\mathrm{S} / \mathrm{Hs}$ tend to be quite accurate but not necessarily fast. A simple example is shown in Fig. 11.15. Note how similar this $\mathrm{S} / \mathrm{H}$ is to the $\mathrm{S} /$ H of Fig. 11.13. During $\phi_{1}$, capacitor $C_{H}$ is connected between the input signal source and the inverting input of the opamp. At the same time, the inverting input and the output of the opamp are connected together. This causes the voltages at both of these nodes to be equal to the input-offset voltage of the opamp, $\mathrm{V}_{\text {off. }}$ Thus, $\mathrm{C}_{\mathrm{H}}$ is charged up to $\mathrm{V}_{\text {in }}-\mathrm{V}_{\text {off }}$. Next, during $\phi_{2}$, the opamp is taken out of reset mode, and the capacitor $\mathrm{C}_{\mathrm{H}}$ is connected between the opamp output and its inverting input. This will cause the output voltage to be equal to $\mathrm{V}_{\mathrm{in}}$, irrespective of the input-offset voltage of the opamp. Note that this circuit is an example of a sample-and-hold that is not thought of as a track-and-hold circuit. Specifically, during the sample phase, the opamp output voltage will be very close to 0 V (or whatever reference potential is connected to the positive opamp terminal in Fig. 11.15) rather than tracking the input voltage. This places a requirement on the opamp to have a very large slew rate, or the speed is seriously degraded. Also, obviously, the opamp output is invalid during $\phi_{1}$, the sample phase.
+image_name:(a)
+description:
+[
+name: C1, type: Capacitor, value: C1, ports: {Np: Vin, Nn: InN(A1)}
+name: C2, type: Capacitor, value: C2, ports: {Np: Vout, Nn: Out(A1)}
+name: A1, type: OpAmp, value: A1, ports: {InP: GND, InN: InN(A1), OutP: Out(A1)}
+]
+extrainfo:This is a sample-and-hold circuit in sample mode. The op-amp output is invalid during the sample phase, and the input voltage is sampled across capacitor C1. The output voltage is held by capacitor C2.
+image_name:(b)
+description:
+[
+name: C1, type: Capacitor, value: C1, ports: {Np: InN(A1), Nn: Vout}
+name: C2, type: Capacitor, value: C2, ports: {Np: Vout, Nn: Out(A1)}
+name: A1, type: OpAmp, value: A1, ports: {InP: GND, InN: InN(A1), OutP: Out(A1)}
+]
+extrainfo:The circuit represents a sample-and-hold configuration in hold mode with two capacitors and an operational amplifier. C1 is connected between the input and output, while C2 is connected between the output and ground. The op-amp is configured with its non-inverting input grounded.
+
+Fig. 11.14 The circuit configurations of the $S / H$ of Fig. 11.13 during ( a) sa mple mode and (b) hold mode.
+image_name:Fig. 11.16
+description:
+[
+name: φ1, type: NMOS, ports: {S: Vin, D: X, G: φ1}
+name: φ2, type: NMOS, ports: {S: X, D: Vout, G: φ2}
+name: C_H, type: Capacitor, value: C_H, ports: {Np: X, Nn: InN(A1)}
+name: φ1, type: NMOS, ports: {S: InN(A1), D: Vout, G: φ1}
+name: A1, type: OpAmp, value: A1, ports: {InP: GND, InN: InN(A1), OutP: Vout}
+]
+extrainfo:The circuit represents a sample-and-hold configuration in hold mode with two capacitors and an operational amplifier. The op-amp is configured with its non-inverting input grounded. During sampling, all switches are on except φ2.
+
+Fig. 11.15 A simple switched-capacitor S/H.
+image_name:Fig. 11.15
+description:The circuit represents a sample-and-hold configuration in hold mode with two capacitors and an operational amplifier. The op-amp is configured with its non-inverting input grounded. During sampling, all switches are on except φ2.
+
+Fig. 11.16 A recycling $S / H$.
+
+An interesting variation somewhat similar to the S/Hs of Figs. 11.13 and 11.15 adds two unity-gain buffers and two more switches to help improve accuracy. The $\mathrm{S} / \mathrm{H}$ is shown in Fig. 11.16 [Real, 1991]. During sampling, all switches are on except $Q_{2}$. This connects $C_{1}$ and $C_{2}$ together and charges them to the input voltage. During this time, the input impedance is quite large due to the inclusion of buffer $\mathrm{B}_{1}$. At the same time, the opamp is being reset and the positive terminal of the opamp is charged to 0 V . Next, $Q_{4}$ and $Q_{5}$ are turned off, and shortly thereafter $Q_{1}$ and $Q_{3}$ are turned off. Finally, $Q_{2}$ is turned on. This configures the circuit as shown in Fig. 11.17. Note the similarity between this configuration and that of Fig. 11.14(b). The unity-gain feedback holds the output during this phase, and also the output impedance of the $\mathrm{S} / \mathrm{H}$ is very low. Because $\mathrm{Q}_{4}$ and $\mathrm{Q}_{5}$ turn off slightly before $Q_{1}$ and $Q_{3}$, their clock feedthrough is not only signal independent but largely cancels due to the common-mode rejection of the input stage of the amplifier [Martin, 1987]. The charge injection of $Q_{1}$ and $Q_{2}$ does not affect the output voltage. The charge injection of $Q_{3}$ is signal dependent and does affect the output voltage, but its effect is minimized by the loop gain similar to the S/H of Fig. 11.13.
+
+An interesting variation on the $\mathrm{S} / \mathrm{Hs}$ of Figs. 11.10 and 11.15 is the $\mathrm{S} / \mathrm{H}$ shown in Fig. 11.18 from [Gatti, 1992]. This T/H has an output that is always valid and incorporates a number of features. During sample mode, the input-offset voltage of the first opamp is stored across $\mathrm{C}_{\mathrm{OF}}$. At the same time, $\mathrm{C}_{\mathrm{S}}$ is sampling the input voltage, and the second opamp is holding the previously-sampled input voltage. During the next phase, the inputoffset voltage of the first opamp is eliminated, and $\mathrm{C}_{\mathrm{s}}$ is connected to the output while the feedback loop is enabled. This arrangement causes the output voltage to be equal to the just-sampled input voltage. The clock feedthrough of switch $S_{2}$ is cancelled by the clock feedthrough of switch $S_{3}$. The clock feedthrough of switch $S_{5}$ is cancelled by the clock feedthrough of switch $\mathrm{S}_{6}$ and the added buffer network. The other switches ideally do not cause appreciable errors due to clock feedthrough. The details concerning the operation of this T/H and the required clocking waveforms are left for the interested reader to consult [Gatti, 1992].
+image_name:Fig. 11.17
+description:The circuit is a sample-and-hold with a low-pass filter, used for converting a sampled-data signal to a continuous-time signal in a DAC application. It includes buffers and an operational amplifier for signal processing.
+
+Fig. 11.17 The S/H of Fig. 11.16 when in hold mode.
+
+Yet another example of a switched-capacitor S/H is shown in Fig. 11.19 [Sooch, 1991]. This circuit combines a sample-and-hold with a low-pass filter and was used to convert a signal from the sampled-data domain to the continuous-time domain at the output of a high-quality audio digital-to-analog converter based on oversampling techniques. The low-pass filtering was used to help convert from a single-bit high-frequency signal to a decimated lower-frequency multi-bit signal. During $\phi_{1}, \mathrm{C}_{1}$ is connected between the input voltage and ground. Next, during $\phi_{2}$, it is connected between the output and the inverting input of the opamp. At this time, its charge is shared with the charge being stored across $\mathrm{C}_{2}$, which came from previous samples. For low-frequency signals, the output voltage will equal the input voltage in the steady state. Higher frequency changes in the input signal will be lowpass filtered. For $\mathrm{C}_{2}$ greater than $\mathrm{C}_{1}$ by at least a few times, it can be shown using switched-capacitor analysis techniques [Martin, 1980] that the $-3-\mathrm{dB}$ frequency of the low-pass filter is approximately given by
+
+$$
+\begin{equation*}
+\mathrm{f}_{-3 \mathrm{~dB}} \cong \frac{1}{2 \pi} \frac{\mathrm{C}_{1}}{\mathrm{C}_{2}} \mathrm{f}_{\mathrm{clk}} \tag{11.7}
+\end{equation*}
+$$
+
+image_name:Fig. 11.18 A switched-capacitor S/H.
+description:This is a switched-capacitor sample-and-hold (S/H) circuit that also functions as a low-pass filter. The circuit uses multiple switches and capacitors to sample the input signal and hold it for a certain period. The op-amps are used to buffer and amplify the signal. The switches are controlled by clock phases to perform the sampling and holding operations.
+
+Fig. 11.18 A switched-capacitor S/H.
+image_name:Fig. 11.18 A switched-capacitor S/H.
+description:This circuit is a switched-capacitor sample-and-hold (S/H) circuit that also functions as a low-pass filter. It uses switches and capacitors to sample the input signal and hold it for a certain period. The op-amp buffers and amplifies the signal, with switches controlled by clock phases to perform sampling and holding operations.
+
+Fig. 11.19 A switched-capacitor sample-and-hold and low-pass filter.
+where $\mathrm{f}_{\mathrm{clk}}$ is the clock frequency. While this example does not eliminate the effects of opamp finite-input voltage offsets, unlike the previous two examples, it does have the advantage that its output is always valid.
+
+The switched-capacitor sample-hold circuits just shown (except for that of Fig. 11.18) do have dc offsets due to clock feedthrough from the switches connected to the inverting inputs of the opamps. However, these offsets are largely signal independent assuming the opamp has a reasonable gain. Also, it is possible to minimize these offsets by including a clock-feedthrough cancellation network connected to the positive input of the opamp, similar to what is described in [Martin, 1987]. Alternatively, fully differential sample-and-holds can be used, which also helps minimize the effects of clock feedthrough.
+
+## 11.4 BIPOLAR AND BICMOS SAMPLE-AND-HOLDS
+
+In this section, bipolar and BiCMOS sample-and-hold circuits are described. It should be noted that BiCMOS sample-and-hold circuits are often realized using the CMOS techniques previously described. Here, we look at BiCMOS circuits more closely related to their bipolar counterparts.
+
+Most of the early integrated bipolar sample-and-holds were based on using a diode-bridge switch, as shown in Fig. 11.20 [Erdi, 1978]. In track mode the bias current, $I_{B}$, is turned on and evenly divides between $D_{1}$ and $D_{2}$, as well as between $D_{3}$ and $D_{4}$. This current division results in a low-impedance path between the input and the output with a small-signal impedance of $r_{d}$, where
+
+$$
+\begin{equation*}
+\mathrm{r}_{\mathrm{d}}=\frac{\mathrm{V}_{\mathrm{T}}}{\mathrm{I}_{\mathrm{D} 1}}=\frac{\mathrm{V}_{\mathrm{T}}}{\mathrm{I}_{\mathrm{B}} / 2} \tag{11.8}
+\end{equation*}
+$$
+
+In hold mode, both current sources labelled $\mathrm{I}_{\mathrm{B}}$ are turned off, leaving the hold capacitor, $\mathrm{C}_{\text {hld }}$, open circuited.
+A more practical realization of a diode-bridge track-and-hold is shown in Fig. 11.21 [Matsuzawa, 1990]. During track mode, $\mathrm{V}_{\mathrm{trk}}$ is at a higher voltage than $\mathrm{V}_{\mathrm{hld}}$, and $\mathrm{Q}_{2}$ will be on and conducting $2 \mathrm{I}_{\mathrm{B}}$. Half of this current comes from the current source connected to the node $\mathrm{V}_{2}$. The other half comes from the current source connected to node $\mathrm{V}_{1}$ after going through the diode bridge. Thus, during track mode, the diode bridge is low impedance, and the node $\mathrm{V}_{3}$ will track the input signal. The output voltage will also track this node through the unity-gain output buffer. Also, during this phase, the diodes $\mathrm{D}_{5}$ and $\mathrm{D}_{6}$ are reverse biased.
+
+When the track-and-hold is placed in hold mode, $Q_{2}$ is turned off and $Q_{1}$ is turned on. Since $Q_{2}$ is turned off, the current from the source connected to the node $\mathrm{V}_{2}$ now flows through the diode $\mathrm{D}_{6}$, turning it on. This causes
+image_name:Track mode
+description:The diagram illustrates a bipolar track and hold circuit using a diode bridge. In track mode, diodes D1, D2, D3, and D4 are conducting (on). The current source I_B provides biasing for the diodes. The capacitor C_hld is connected between Vout and GND, holding the output voltage during the hold mode.
+image_name:Hold mode
+description:The circuit is a bipolar track and hold using a diode bridge. In hold mode, all diodes are off, and the capacitor C_hld maintains the output voltage Vout.
+
+Fig. 11.20 A bipolar track and hold based on using a diode bridge.
+$V_{2}$ to be one diode drop above $V_{\text {out }}$, which causes diodes $D_{3}$ and $D_{4}$ to become reverse biased. At the same time, $\mathrm{Q}_{1}$ will be conducting current $2 \mathrm{I}_{\mathrm{B}}$. Half of this will come from the current source connected to node $\mathrm{V}_{1}$. The other half comes from $\mathrm{V}_{\text {out }}$ through diode $\mathrm{D}_{5}$, causing it to become forward biased. Therefore, $\mathrm{V}_{1}$ will be one diode drop below $\mathrm{V}_{\text {out }}$, and diodes $\mathrm{D}_{1}$ and $\mathrm{D}_{2}$ will be reverse biased. Thus, all the diodes in the diode bridge are reverse biased, and the node $\mathrm{V}_{3}$ is disconnected from the input signal.
+
+The circuit of Fig. 11.21 has a number of advantages compared to the simple circuit of Fig. 11.20. Perhaps the most important of these is that the clock feedthrough is signal independent. This independence occurs because when the diode bridge turns off, the voltage changes of nodes $\mathrm{V}_{1}$ and $\mathrm{V}_{2}$ are from a voltage closely equal to $\mathrm{V}_{\mathrm{in}}$, to a voltage
+image_name:Fig. 11.21 An improved example of a diode-bridge track and hold.
+description:The circuit is a diode-bridge track and hold circuit, which features signal-independent clock feedthrough due to the diode bridge configuration. It uses two current sources and an operational amplifier to maintain the hold function.
+
+Fig. 11.21 An improved example of a diode-bridge track and hold.
+one diode drop below $\mathrm{V}_{\mathrm{in}}$, and a voltage one diode drop above $\mathrm{V}_{\mathrm{in}}$, respectively, regardless of the value of $\mathrm{V}_{\mathrm{in}}$. Thus, the charge from turning the diode bridge off, and changing the reverse-bias voltage of the diodes in the bridge, is signal independent. Furthermore, the charge from $D_{1}$ and $D_{2}$ will (to a first-order degree) cancel the charge from $D_{3}$ and $D_{4}$, assuming fast clock waveforms, which also minimizes the effects of charge injection. It should be mentioned that in many implementations, the diodes would all be Schottky diodes, which don't have minority carrier charge storage when they are on, and, thus, turn off faster than regular diodes and have smaller hold steps. A second advantage of Fig. 11.21 is that the sample-time uncertainty caused by the finite slope of the clock waveforms is greatly minimized. Finally, a third advantage of Fig. 11.21 is that when in hold mode, the signal feedthrough is substantially smaller. When the simple circuit of Fig. 11.20 is in hold mode, the diodes are turned off but are floating. The input signal is then capacitively coupled through the junction capacitance of these reverse-biased diodes to the hold capacitor. The magnitude of this signal feedthrough is easily calculated using the capacitor-divider formula. This signal feedthrough is minimized in the improved circuit of Fig. 11.21, because during hold mode, nodes $V_{1}$ and $V_{2}$ are connected to $V_{\text {out }}$ through low-impedance paths consisting of conducting diodes $D_{5}$ and $D_{6}$, respectively. This effectively shields the node $\mathrm{V}_{3}$ from the input signal during hold mode.
+
+In the BiCMOS realization presented in [Matsuzawa, 1990], the input transistors to the unity-gain buffer were p-channel MOS transistors that minimized the droop on the hold capacitor during hold-mode, which would normally be caused by finite-based currents of bipolar input transistors.
+
+It should be noted in Fig. 11.21 that the maximum input-signal excursions during hold mode are limited to less than two diode drops above or below the input signal voltage at the time the track and hold went into hold mode. Otherwise, one of the diodes $D_{1}$ or $D_{3}$ will become forward biased, which will tend to clamp the input signal. For high-speed track and holds, this input amplitude restriction is not usually a serious limitation as peak signals are usually limited to be less than one volt. Furthermore, the input signal range can be increased by replacing each of $D_{5}$ and $D_{6}$ with two series diodes. This would increase the maximum allowable signal-swing excursion to three diode drops.
+
+Key Point: S/Hs suffer from voltage droop in hold mode when bipolar transistors draw base currents from the hold capacitors. The droop can be reduced by using MOSFETs instead, or by using a differential signal path so that both sides exhibit similar droop.
+
+One of the major limitations of bipolar $\mathrm{S} / \mathrm{Hs}$ is a droop in the voltage being stored across a capacitor during hold mode, caused by the finite base currents of bipolar transistors. One of the major ways of minimizing this droop is to use fully differential approaches where the droop is the same in both paths, and the differential signal is, to a first-order approximation, unaffected. An example of a fully differential diode-bridge-based T/H is given in [Colleran, 1993]. In this example, the current sources were realized using resistors, and additional circuitry was also included to minimize errors introduced by these resistors.
+
+An interesting BiCMOS S/H is shown in Fig. 11.22 [Wakayama, 1992]. This $\mathrm{S} / \mathrm{H}$ uses bipolar switches that appear similar to the diode bridge switches, but operate differently. Note that the direction of diodes $D_{2}$ and $D_{4}$ have been reversed compared to the circuit of Fig. 11.20. When $V_{\text {trk } 1}$ is greater than $V_{\text {hld } 1}$, then $Q_{3}$ will be conducting $3 I_{B}$. $I_{B}$ of this will come from $M_{5}$ through $Q_{1}, I_{B}$ of this will come from $M_{6}$, and $I_{B}$ of this will come from $M_{7}$ through $D_{2}$ and $D_{1}$. Since both $Q_{1}$ and $D_{1}$ are conducting, $V_{\text {out1 }}$ will equal $V_{\text {in }}$. Diodes $D_{3}$ and $D_{4}$ are reverse biased and $V_{\text {out2 }}$ is isolated from $V_{\text {in }}$. The ratios of the currents in $M_{2}, M_{3}$, and $M_{4}$ are accurately determined by the feedback loop including $M_{1}, M_{2}, M_{5}$, and the unity-gain buffer. When $V_{\text {trk } 1}$ is less than $V_{\text {hld } 1}$, then $Q_{4}$ will be conducting $3 I_{B}$. This will cause $Q_{1}, D_{1}$, and $D_{2}$ to turn off and $Q_{2}, D_{3}$, and $D_{4}$ to turn on. In this phase, $V_{\text {out }}$ will be isolated from $V_{\text {in }}$, and $\mathrm{V}_{\text {out2 }}$ will track $\mathrm{V}_{\mathrm{in}}$. Notice that the input is buffered from the holding capacitors by emitter followers (either $Q_{1}$ or $\mathrm{Q}_{2}$ ) and that the load current on the input source is constant (and equal to the base current of the emitter followers). Also, when one output is in track mode, the other is in hold mode. This arrangement can possibly be used to effectively double a data rate. Finally, as is explained in [Wakayama, 1992], during slewing the current available to charge or discharge the holding capacitors is dynamically increased to $3 \mathrm{I}_{\mathrm{B}}$ rather than the quiescent $\mathrm{I}_{\mathrm{B}}$.
+
+The BiCMOS S/H shown in Fig. 11.23 is referred to as a switched emitter-follower [Vorenkamp, 1992]. The degenerated differential pair $Q_{1,2}$ serves as an input buffer. When in track mode, the tail current $I_{2}$ is steered towards $Q_{4,5}$; this turns on transistors $Q_{6,7}$ which both serve as emitter followers. The hold capacitor $C_{h l d}$ is
+image_name:Fig. 11.22 A BiCMOS sample-and-hold.
+description:The circuit is a BiCMOS sample-and-hold circuit. It uses a combination of PMOS and NMOS transistors along with NPN bipolar transistors and diodes to achieve high-speed sampling and holding. The op-amp provides input buffering, and the current source increases the tail current during discharge. The hold capacitors are driven by low-impedance buffers, and the switching between track and hold modes is controlled by the steering of tail current.
+
+Fig. 11.22 A BiCMOS sample-and-hold.
+image_name:Fig. 11.23 A high-speed bipolar track-and-hold circuit
+description:The circuit is a high-speed bipolar track-and-hold circuit. It uses NPN transistors and capacitors to sample and hold the input voltage. The circuit is designed to quickly switch between track and hold modes by steering the tail current. The hold capacitors are driven by low-impedance buffers, and the switching is controlled by the differential voltage between Vtrk and Vhld.
+
+Fig. 11.23 A high-speed bipolar track-and-hold circuit [Vorenkamp, 1992].
+therefore driven by a low-impedance buffer. When the circuit switches to hold mode, all of the tail current $I_{2}$ is directed away from $Q_{4,5}$, which turn off the emitter followers $Q_{6,7}$ and leave the hold capacitor. Since the current will switch from $Q_{3}$ to $Q_{4,5}$ over a very narrow range of differential voltage at $V_{\text {trk }}-V_{\text {hld }}$, the switching can occur quickly even with a low-swing clock. Also, in hold mode all of $\mathrm{I}_{2}$ is directed through $Q_{3}$ and from there through the resistor $R$. The resulting additional voltage drop across $R$ reduces the base voltage of $Q_{6}$, helping to turn it off quickly. Unfortunately, even when $Q_{6}$ is off in hold mode, its finite base-emitter capacitance $C_{\text {ber }}$ provides a path for signal feedthrough in hold mode. For this reason, $C_{F} \approx C_{b e}$ is introduced to provide signal feedthrough of the
+same amplitude but opposite polarity, cancelling the feedthrough through $\mathrm{C}_{\mathrm{be} 6}$. The circuit operates open-loop and can therefore be very fast.
+
+An alternate BiCMOS S/H is described in [Sone, 1993], which makes use of the basic architecture shown in Fig. 11.12, except the switches are realized using bipolar switches. There have been a number of other alternative bipolar and BiCMOS track and holds that have been reported in the literature. Some alternative and interesting BiCMOS examples include [Fernandes, 1989; Robertson, 1990; and Real, 1991]. Some alternative and interesting bipolar examples include [Moraveji, 1991] and [Petschacher, 1990]. The interested reader is referred to the applicable references.
+
+## 11.5 TRANSLINEAR GAIN CELL
+
+An important analog building block for bipolar circuits is the translinear gain cell ${ }^{3}$ [Gilbert, 1968a; Gilbert, 1990]. These gain cells are useful when building circuits requiring varying gain, such as in adjustable continuous-time filters and voltage-controlled amplifiers. They are also useful in realizing four-quadrant analog multipliers, as will be seen in the next section.
+
+A translinear gain cell is shown in Fig. 11.24. It has differential inputs and outputs that are current signals. The first stage simply consists of pn junction loads, which in this case are realized by the base-emitter junctions of $Q_{1}$ and $Q_{2}$. The second stage is a differential pair. To analyze this cell, we recall the relationship between the baseemitter voltage and collector current,
+
+$$
+\begin{equation*}
+\mathrm{I}_{\mathrm{C}}=\mathrm{I}_{\mathrm{S}} \mathrm{e}^{\left(\mathrm{v}_{\mathrm{be}} / \mathrm{v}_{\mathrm{T}}\right)} \quad \text { or } \quad \mathrm{v}_{\mathrm{be}}=\mathrm{V}_{\mathrm{T}} \ln \left(\frac{\mathrm{I}_{\mathrm{C}}}{\mathrm{I}_{\mathrm{S}}}\right) \tag{11.9}
+\end{equation*}
+$$
+
+Thus, ignoring the base currents of $Q_{3}$ and $Q_{4}$, we see that the voltage at the emitter of $Q_{1}$ is given by
+
+$$
+\begin{equation*}
+\mathrm{v}_{\mathrm{e} 1}=\left(-\mathrm{V}_{\mathrm{T}}\right) \ln \left(\frac{\mathrm{I}_{1}+\mathrm{i}_{01}}{\mathrm{I}_{\mathrm{S} 1} / \alpha}\right) \tag{11.10}
+\end{equation*}
+$$
+
+image_name:Fig. 11.24 A four-transistor gain cell
+description:The circuit is a four-transistor gain cell with transistors Q1 and Q2 forming a differential pair. The output current i_o is a scaled version of i_01, given by the relationship i_o = (I2/I1) * i_01. The circuit uses current mirrors with I2 and 2I2 to achieve this scaling.
+
+Fig. 11.24 A four-transistor gain cell. The output current, $i_{0}$, is a scaled version of $i_{01}$.
+where $\alpha=\beta /(\beta+1)$. For $Q_{2}$, we have
+
+$$
+\begin{equation*}
+\mathrm{v}_{\mathrm{e} 2}=\left(-\mathrm{V}_{\mathrm{T}}\right) \ln \left(\frac{\mathrm{I}_{1}-\mathrm{i}_{\mathrm{o} 1}}{\mathrm{I}_{\mathrm{S} 2} / \alpha}\right) \tag{11.11}
+\end{equation*}
+$$
+
+Now, assuming $Q_{1}$ and $Q_{2}$ are matched such that $I_{S 1}=I_{S 2}$, and defining $\Delta V$ to be the difference between $V_{e 2}$ and $\mathrm{v}_{\mathrm{e} 1}$, we have
+
+$$
+\begin{equation*}
+\Delta \mathrm{V} \equiv \mathrm{v}_{\mathrm{e} 2}-\mathrm{v}_{\mathrm{e} 1}=\mathrm{V}_{\mathrm{T}} \ln \left(\frac{\mathrm{I}_{1}+\mathrm{i}_{01}}{\mathrm{I}_{1}-\mathrm{i}_{01}}\right) \tag{11.12}
+\end{equation*}
+$$
+
+Note that this voltage difference, $\Delta \mathrm{V}$, does not depend on the scale current, $\mathrm{I}_{\mathrm{S}}$.
+To analyze the current output from the differential pair of $Q_{3}$ and $Q_{4}$, we recall from Section 3.10 that the large-signal emitter currents through a differential pair are given by
+
+$$
+\begin{equation*}
+\mathrm{i}_{\mathrm{E} 3}=\frac{2 \mathrm{I}_{2}}{1+\mathrm{e}^{(-\Delta \mathrm{V}) / \mathrm{V}_{\mathrm{T}}}} \quad \text { and } \quad \mathrm{i}_{\mathrm{E} 4}=\frac{2 \mathrm{I}_{2}}{1+\mathrm{e}^{(\Delta \mathrm{V}) / V_{T}}} \tag{11.13}
+\end{equation*}
+$$
+
+Therefore, the collector current, $\mathrm{i}_{\mathrm{C} 3}$, is equal to
+
+$$
+\begin{equation*}
+\mathrm{i}_{\mathrm{C} 3}=\alpha \mathrm{i}_{\mathrm{E} 3}=\frac{\alpha 2 \mathrm{I}_{2}}{1+\left(\frac{\mathrm{I}_{1}-\mathrm{i}_{01}}{\mathrm{I}_{1}+\mathrm{i}_{01}}\right)}=\alpha \mathrm{I}_{2}+\alpha \frac{\mathrm{I}_{2}}{\mathrm{I}_{1}} \tag{11.14}
+\end{equation*}
+$$
+
+and for $\alpha=1$, we have
+
+$$
+\begin{equation*}
+\mathrm{i}_{\mathrm{C} 3}=\mathrm{I}_{2}+\frac{\mathrm{I}_{2}}{\mathrm{I}_{1}} \tag{11.15}
+\end{equation*}
+$$
+
+In a similar manner, $\mathbf{i}_{\mathrm{C} 4}$ is equal to
+
+$$
+\begin{equation*}
+\mathrm{i}_{\mathrm{C} 4}=\mathrm{I}_{2}-\frac{\mathrm{I}_{2}}{\mathrm{I}_{1}} \tag{11.16}
+\end{equation*}
+$$
+
+Finally, the output current, $i_{o}$, is given by
+
+$$
+\begin{equation*}
+\mathrm{i}_{\mathrm{o}}=\mathrm{i}_{\mathrm{C} 3}-\mathrm{I}_{2}=\mathrm{I}_{2}-\mathrm{i}_{\mathrm{C} 4}=\frac{\mathrm{I}_{2}}{\mathrm{I}_{1}} \tag{11.17}
+\end{equation*}
+$$
+
+In other words, the output current is equal to a scaled version of the input current where the scaling factor is determined by the ratio of two dc bias currents, $I_{2}$ and $I_{1}$.
+
+An important point to note here is that not only is the difference between $\mathrm{i}_{\mathrm{C} 3}$ and $\mathbf{i}_{C 4}$ linearly related to the input current, but also each of $\mathbf{i}_{\mathrm{C} 3}$ and $\mathrm{i}_{\mathrm{C}}$ is also linearly related (except for the dc bias current). This result is important since it implies that even if the difference between these two currents is not taken precisely, it does not affect the linearity of the overall circuit. Furthermore, note that the gain and linearity are not dependent on any transistor parameters such as $\beta$ or $I_{S}$. However, one
+
+Key Point: Translinear gain cells are important blocks in analog bipolar design, capable of prviding very linear variable gains and analog multipliers.
+should be aware that there are mechanisms that will create distortion in a gain cell, such as mismatches between transistors and the occurrence of linear resistances in the pairs $Q_{1}, Q_{2}$ and $Q_{3}, Q_{4}$.
+
+#### EXAMPLE 11.3
+
+Consider the gain cell shown in Fig. 11.24 where $I_{1}$ is fixed to a bias current of $200 \mu \mathrm{~A}$, while $\mathrm{I}_{2}$ varies such that the gain changes from 0.5 to 4 . What are the extreme values of $I_{2}$ needed? Also, what is the maximum peak current that should be used for $\mathrm{i}_{\mathrm{ol}}$, assuming all transistors should remain in the active region with at least $20 \mu \mathrm{~A}$ of emitter current?
+
+#### Solution
+
+Making use of (11.17), when a gain of 0.5 is needed, $I_{2}$ should be one-half of $I_{1}$, which is $100 \mu \mathrm{~A}$. When a gain of 4 is needed, $I_{2}$ should be four times that of $I_{1}$, which is $800 \mu \mathrm{~A}$. Therefore, the extreme values of $I_{2}$ are $100 \mu \mathrm{~A}$ and $800 \mu \mathrm{~A}$.
+
+The maximum peak current of $i_{01}$ is found by noting that the emitter currents of either transistors $Q_{1}$ or $Q_{2}$ should not go below $20 \mu \mathrm{~A}$. Since they are biased with $200 \mu \mathrm{~A}$ each, the peak current of $i_{01}$ should be less than $180 \mu \mathrm{~A}$. Note that if $I_{1}$ were varied while $I_{2}$ remained fixed, the maximum peak level of $i_{01}$ would change as $I_{1}$ was varied.
+
+## 11.6 TRANSLINEAR MULTIPLIER
+
+A translinear multiplier ${ }^{4}$ is one approach for realizing a four-quadrant multiplier circuit. Multiplier circuits are useful in a variety of applications, such as frequency modulators in communication systems or phase detectors in phase-locked loops. They rely upon the hyperbolic tangent voltage-current relationship of the bipolar differential pair, repeated here from (8.81)
+
+$$
+\begin{equation*}
+\mathrm{I}_{\mathrm{C} 2}-\mathrm{I}_{\mathrm{C} 1}=\alpha \mathrm{I}_{\mathrm{EE}} \tanh \left(\mathrm{~V}_{\mathrm{id}} / 2 \mathrm{~V}_{\mathrm{T}}\right) \tag{11.18}
+\end{equation*}
+$$
+
+Key Point: Analog multiplication can be performed by superimposing an input signal on the tail current of a bipolar differential pair. If both of the inputs to be multiplied are differential, two differential pairs are needed.
+
+Hence, the differential output current is linearly related to the emitter current $\mathrm{I}_{\mathrm{EE}}$. The principle of operation is to precede the differential pair input with an inverse hyperbolic tangent nonlinearity (also provided by bipolar transistors), and then to superimpose the second input onto the differential pair's tail current, resulting in a linear multiplication of the inputs. If both of the inputs to be multiplied are differential, two differential pairs are used.
+
+One implementation of a translinear multiplier using two translinear gain cells is the six-transistor circuit in Fig. 11.25 [Gilbert, 1968b]. We can analyze this multiplier by making use of the results for the gain-cell circuit just discussed preceding. Note that the preceding multiplier circuit is effectively two gain-cell circuits with their output signals cross-coupled. Specifically, one gain cell consists of the two differential pairs $Q_{1}, Q_{2}$ and $Q_{5}, Q_{6}$, while the other gain cell consists of the differential pair $Q_{3}, Q_{4}$ and makes use of the same voltage generating pair, $Q_{5}, Q_{6}$. Thus, recognizing the similarity of this circuit with that of Fig. 11.24 and making use of (11.15) and (11.16), we find the following four collector currents:
+
+$$
+\begin{equation*}
+\mathrm{i}_{\mathrm{C} 1}=\frac{\left(\mathrm{I}_{2}+\mathrm{i}_{2}\right)}{2}+\frac{\left(\mathrm{I}_{2}+\mathrm{i}_{2}\right)}{2 \mathrm{I}_{1}} \mathrm{i}_{1} \tag{11.19}
+\end{equation*}
+$$
+
+[^2]image_name:Fig. 11.25 A six-transistor translinear multiplier.
+description:The circuit is a six-transistor translinear multiplier. It uses two differential pairs (Q3, Q4) and (Q5, Q6) with a common voltage-generating pair (Q1, Q2). The inputs are (I1 + i1) and (I1 - i1) for Q5 and Q6, and (I2 + i2) and (I2 - i2) for the outputs of Q1 and Q2. The output is taken from the collector of Q1.
+
+Fig. 11.25 A six-transistor translinear multiplier.
+
+$$
+\begin{align*}
+& \mathrm{i}_{\mathrm{C} 2}=\frac{\left(\mathrm{I}_{2}+\mathrm{i}_{2}\right)}{2}-\frac{\left(\mathrm{I}_{2}+\mathrm{i}_{2}\right)}{2 \mathrm{I}_{1}} \mathrm{i}_{1}  \tag{11.20}\\
+& \mathrm{i}_{\mathrm{C} 3}=\frac{\left(\mathrm{I}_{2}-\mathrm{i}_{2}\right)}{2}+\frac{\left(\mathrm{I}_{2}-\mathrm{i}_{2}\right)}{2 \mathrm{I}_{1}} \mathrm{i}_{1}  \tag{11.21}\\
+& \mathrm{i}_{\mathrm{C} 4}=\frac{\left(\mathrm{I}_{2}-\mathrm{i}_{2}\right)}{2}-\frac{\left(\mathrm{I}_{2}-\mathrm{i}_{2}\right)}{2 \mathrm{I}_{1}} \mathrm{i}_{1} \tag{11.22}
+\end{align*}
+$$
+
+Note here that we have made the substitutions of signal currents, $\mathrm{I}_{2} \pm \mathrm{i}_{2}$, in what was simply a bias current of $2 \mathrm{I}_{2}$ in Fig. 11.24. In addition, once again these four collector currents are linear in $i_{2}$ if $i_{1}$ remains a constant value and linear in $\dot{i}_{1}$ if $\dot{i}_{2}$ remains constant. To find the output currents, we combine collector currents to obtain
+
+$$
+\begin{equation*}
+\mathrm{I}_{2}+\mathrm{i}_{\mathrm{o}} \equiv \mathrm{i}_{\mathrm{C} 1}+\mathrm{i}_{\mathrm{C} 4}=\mathrm{I}_{2}+\frac{\mathrm{i}_{1} \mathrm{i}_{2}}{\mathrm{I}_{1}} \tag{11.23}
+\end{equation*}
+$$
+
+and
+
+$$
+\begin{equation*}
+\mathrm{I}_{2}-\mathrm{i}_{\mathrm{o}} \equiv \mathrm{i}_{\mathrm{C} 2}+\mathrm{i}_{\mathrm{C} 3}=\mathrm{I}_{2}-\frac{\mathrm{i}_{1} \mathrm{i}_{2}}{\mathrm{I}_{1}} \tag{11.24}
+\end{equation*}
+$$
+
+and taking the difference of these two equations results in
+
+$$
+\begin{equation*}
+\mathrm{i}_{0}=\frac{\mathrm{i}_{1} \mathrm{i}_{2}}{\mathrm{I}_{1}} \tag{11.25}
+\end{equation*}
+$$
+
+Thus, we see that the output signals are linear with respect to $i_{2}$ and can be scaled by the ratio $i_{1} / I_{1}$. Also, note that $i_{1}$ can be made positive or negative (as it is the amount of the bias current deviation from $I_{1}$ ), and so the output current, $i_{0}$, is a scaled positive or negative version of $i_{2}$. A similar result occurs with respect to the output signal and $i_{1}$. Thus, this multiplier is called a four-quadrant multiplier. Recall that a gain cell can only scale $i_{1}$ with respect to the ratio of two positive bias currents and is therefore only a two-quadrant multiplier.
+
+If voltage inputs, rather than current inputs, are desired, then one can precede the multiplier with voltage-tocurrent converters. The simplest of these are differential pairs having emitter degeneration, as shown in Fig. 11.26. More linear, but more complicated, voltage-to-current converters include local feedback to eliminate distortions due to the modulation of the base-emitter voltages. Examples of these circuits are given in Chapter 12, where continuous-time filters are discussed.
+image_name:Fig. 11.26
+description:This circuit is a six-transistor translinear multiplier with a degenerated input differential pair used for voltage-to-current conversion. It utilizes NPN transistors and current sources to achieve multiplication of input signals. The circuit is designed to handle two input currents and provide an output current that is a function of these inputs.
+
+Fig. 11.26 The six-transistor translinear multiplier with a degenerated input differential pair to perform voltage-to-current conversion of input 2.
+
+#### EXAMPLE 11.4
+
+Consider the translinear multiplier circuit shown in Fig. 11.25, where $I_{1}$ and $I_{2}$ are fixed bias currents of $100 \mu \mathrm{~A}$ and $200 \mu \mathrm{~A}$, respectively. If $i_{1}$ is the gain-controlling current, what is that maximum gain for $i_{0} / i_{2}$, assuming all transistors should remain in the active region with at least $20 \mu \mathrm{~A}$ of emitter current?
+
+#### Solution
+
+To maintain $20 \mu \mathrm{~A}$ of current through $\mathbf{Q}_{5}$ or $Q_{6}$, the magnitude of $i_{1}$ should be limited to $80 \mu \mathrm{~A}$. As seen from (11.25), such a limit results in the peak gains being $\pm 0.8$. A gain of zero would occur if collector currents of $Q_{5}$ and $Q_{6}$ were equal.
+
+Note that this multiplier circuit cannot get gain from $i_{2}$ to $i_{0}$, while gain is possible if the input signal is taken to be $\mathrm{i}_{1}$.
+
+The translinear multiplier may also be adapted to implementation in CMOS. The effort is challenging because MOSFETs do not provide an exponential voltage-current relationship in active mode, so for high accuracy compensating nonlinearities are introduced. See, for example, [Soo, 1982].
+
+## 11.7 KEY POINTS
+
+- In addition to usual analog performance metrics such as dynamic range, linearity, etc., sample-and-hold circuits exhibit other nonidealities typically characterized in terms of their sampling pedestal, input isolation, tracking bandwidth, slew rate, droop rate, and aperture uncertainty. [p. 445]
+- The beat test allows a sample-and-hold (or A/D converter) to be characterized at its maximum clock frequency while monitoring only a relatively low-frequency output signal. [p. 445]
+- Charge injection causes a hold step that is nonlinearly related to the input signal, resulting in signal distortion. [p. 447]
+- The effective sampling time is related to the input signal due to the finite rise/fall time of the clock, another nonideality. [p. 448]
+- The use of opamps and feedback can provide several performance advantages in S/H circuits, although stability requirements generally limit their speed to less than that of open-loop S/H circuits. [p. 449]
+- S/Hs suffer from voltage droop in hold mode when bipolar transistors draw base currents from the hold capacitors. The droop can be reduced by using MOSFETs instead, or by using a differential signal path so that both sides exhibit similar droop. [p. 458]
+- Translinear gain cells are important blocks in analog bipolar design, capable of providing very linear variable gains and analog multipliers. [p. 461]
+- Analog multiplication can be performed by superimposing an input signal on the tail current of a bipolar differential pair. If both of the inputs to be multiplied are differential, two differential pairs are needed. [p. 462]

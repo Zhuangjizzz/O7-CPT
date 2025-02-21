@@ -1,0 +1,16 @@
+[
+    "2.1 Introduction",
+    "2.1.1 First transistor model: current amplifier",
+    "2.2.1 Transistor switch",
+    "2.2.2 Switching circuit examples",
+    "2.2.3 Emitter follower",
+    "A. Impedances of sources and loads",
+    "B. Input and output impedances of emitter followers",
+    "C. Follower drives switch",
+    "D. Important points about followers",
+    "2.2.4 Emitter followers as voltage regulators",
+    "2.2.5 Emitter follower biasing",
+    "2.2.6 Current source",
+    "2.2.7 Common-emitter amplifier",
+    "2.2.8 Unity-gain phase splitter"
+]

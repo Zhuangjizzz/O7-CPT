@@ -1,0 +1,18 @@
+[
+    "16.1.1 Resistor-String Converters",
+    "16.1.2 Folded Resistor-String Converters",
+    "16.1.3 Multiple Resistor-String Converters",
+    "16.1.4 Signed Outputs",
+    "16.2 BINARY-SCALED CONVERTERS",
+    "16.2.1 Binary-Weighted Resistor Converters",
+    "16.2.3 R-2R-Based Converters",
+    "16.2.4 Charge-Redistribution Switched-Capacitor Converters",
+    "16.2.6 Glitches",
+    "16.3 THERMOMETER-CODE CONVERTERS",
+    "16.3.1 Thermometer-Code Current-Mode D/A Converters",
+    "16.3.2 Single-Supply Positive-Output Converters",
+    "16.3.3 Dynamically Matched Current Sources",
+    "16.4.1 Resistor-Capacitor Hybrid Converters",
+    "16.4.2 Segmented Converters",
+    "16.5 KEY POINTS"
+]

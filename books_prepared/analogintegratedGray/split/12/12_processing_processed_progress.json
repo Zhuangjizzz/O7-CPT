@@ -1,0 +1,12 @@
+[
+    "12.1 Introduction",
+    "12.2 Properties of Fully Differential Amplifiers ${ }^{1,2}$",
+    "12.3 Small-Signal Models for Balanced Differential Amplifiers",
+    "12.4 Common-Mode Feedback",
+    "12.4.1 Common-Mode Feedback at Low Frequencies",
+    "12.4.2 Stability and Compensation Considerations in a CMFB Loop",
+    "12.5.1 CMFB Using Resistive Divider and Amplifier",
+    "12.5.2 CMFB Using Two Differential Pairs",
+    "12.5.3 CMFB Using Transistors in the Triode Region",
+    "12.5.4 Switched-Capacitor CMFB"
+]

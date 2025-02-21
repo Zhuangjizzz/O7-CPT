@@ -1,0 +1,17 @@
+[
+    "4.1 Introduction to op-amps - the \"perfect component\"",
+    "4.1.1 Feedback and op-amps",
+    "4.1.2 Operational amplifiers",
+    "4.1.3 The golden rules",
+    "4.2.1 Inverting amplifier",
+    "4.2.2 Noninverting amplifier",
+    "4.2.4 Difference amplifier",
+    "4.2.5 Current sources",
+    "4.2.6 Integrators",
+    "4.2.7 Basic cautions for op-amp circuits",
+    "4.3.1 Linear circuits",
+    "4.3.2 Nonlinear circuits",
+    "4.3.3 Op-amp application: triangle-wave oscillator",
+    "4.3.4 Op-amp application: pinch-off voltage tester",
+    "4.3.5 Programmable pulse-width generator"
+]

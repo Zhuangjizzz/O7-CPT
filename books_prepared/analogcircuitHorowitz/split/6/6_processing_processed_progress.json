@@ -1,0 +1,18 @@
+[
+    "6.1 Introduction",
+    "6.2.1 Frequency response with RC filters",
+    "6.2.2 Ideal performance with LC filters",
+    "6.2.3 Several simple examples",
+    "6.2.4 Enter active filters: an overview",
+    "6.2.5 Key filter performance criteria",
+    "6.2.6 Filter types",
+    "Subplot B: Time Delay vs. Frequency",
+    "Section B: Time Delay vs. Frequency",
+    "6.2.7 Filter implementation",
+    "6.3 Active-filter circuits",
+    "6.3.1 VCVS circuits",
+    "6.3.2 VCVS filter design using our simplified table",
+    "6.3.3 State-variable filters",
+    "6.3.4 Twin-T notch filters",
+    "6.3.5 Allpass filters"
+]

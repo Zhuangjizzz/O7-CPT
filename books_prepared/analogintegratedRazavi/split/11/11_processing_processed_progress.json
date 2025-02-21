@@ -1,0 +1,13 @@
+[
+    "11.1 - Transistor Design Considerations",
+    "11.2 - Deep-Submicron Effects",
+    "11.3 ■ Transconductance Scaling",
+    "11.4 - Transistor Design",
+    "11.4.1 Design for Given $I_{D}$ and $V_{D S, \\min }$",
+    "11.4.2 Design for Given $g_{m}$ and $I_{D}$",
+    "11.4.3 Design for Given $g_{m}$ and $V_{D S, m i n}$",
+    "11.4.4 Design for a Given $g_{m}$",
+    "11.5 ■ Op Amp Design Examples",
+    "11.5.1 Telescopic Op Amp",
+    "11.5.2 Output Behavior"
+]

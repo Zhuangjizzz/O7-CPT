@@ -1,0 +1,17 @@
+[
+    "Chapter4 Building Blocks for Analog Integrated Circuits",
+    "4.1 DESIGN CONSIDERATIONS IN MONOLITHIC CIRCUITS",
+    "An Illustrative Example",
+    "Emitter-Coupled Pairs",
+    "Current Mirrors",
+    "Monolithic Voltage Amplifiers",
+    "What to Expect",
+    "Base Width Modulation Revisited",
+    "Bulk Resistances in the BJT",
+    "The Small-Signal Resistances Seen Looking into the Terminals of a BJT",
+    "The CE Configuration with an Idealized Active Load",
+    "The CC Configuration with an Idealized Active Load",
+    "The CB Configuration with an Idealized Active Load",
+    "Contextual Information:",
+    "The Role of $\\boldsymbol{\\lambda}$ in Dc Calculations"
+]

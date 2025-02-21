@@ -1,0 +1,15 @@
+[
+    "Chapter5 Analog Integrated Circuits",
+    "5.1 THE $\\mu$ A741 OPERATIONAL AMPLIFIER",
+    "A General Overview of the $\\mathbf{7 4 1}$ Op Amp",
+    "The Dc Biasing Network",
+    "The 1st or Input Stage",
+    "The 2nd or Intermediate Stage",
+    "The 3rd or Output Stage",
+    "The Small-Signal Characteristics of the $\\mathbf{7 4 1}$ Op Amp",
+    "5.2 THE TWO-STAGE CMOS OPERATIONAL AMPLIFIER",
+    "Input Offset Voltage Considerations",
+    "Input Voltage Range (IVR)",
+    "Output Voltage Swing (OVS)",
+    "Power-Supply Rejection Ratio (PSRR)"
+]

@@ -1,0 +1,19 @@
+[
+    "18 Oversampling Converters",
+    "18.1 OVERSAMPLING WITHOUT NOISE SHAPING",
+    "18.1.2 White Noise Assumption",
+    "18.1.3 Oversampling Advantage",
+    "18.1.4 The Advantage of 1-Bit D/A Converters",
+    "18.2 OVERSAMPLING WITH NOISE SHAPING",
+    "18.2.1 Noise-Shaped Delta-Sigma Modulator",
+    "18.2.2 First-Order Noise Shaping",
+    "18.2.4 Second-Order Noise Shaping",
+    "18.2.5 Noise Transfer-Function Curves",
+    "18.2.6 Quantization Noise Power of 1-Bit Modulators",
+    "18.2.7 Error-Feedback Structure",
+    "18.3.1 System Architecture of Delta-Sigma A/D Converters",
+    "18.3.2 System Architecture of Delta-Sigma D/A Converters",
+    "18.4.1 Multi-Stage",
+    "18.4.2 Single Stage",
+    "18.5.1 Interpolative Architecture"
+]

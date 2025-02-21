@@ -1,0 +1,21 @@
+[
+    "12 Continuous-Time Filters",
+    "12.1 INTRODUCTION TO CONTINUOUS-TIME FILTERS",
+    "12.1.2 Second-Order Filters",
+    "12.2 INTRODUCTION TO $\\mathrm{G}_{\\mathrm{m}}$-C FILTERS",
+    "12.2.1 Integrators and Summers",
+    "12.2.2 Fully Differential Integrators",
+    "12.2.3 First-Order Filter",
+    "12.2.4 Biquad Filter",
+    "12.3 TRANSCONDUCTORS USING FIXED RESISTORS",
+    "12.4 CMOS TRANSCONDUCTORS USING TRIODE TRANSISTORS",
+    "12.4.1 Transconductors Using a Fixed-Bias Triode Transistor",
+    "12.4.2 Transconductors Using Varying Bias-Triode Transistors",
+    "12.4.3 Transconductors Using Constant Drain-Source Voltages",
+    "12.5 CMOS TRANSCONDUCTORS USING ACTIVE TRANSISTORS",
+    "12.5.1 CMOS Pair",
+    "12.5.2 Constant Sum of Gate-Source Voltages",
+    "12.5.3 Source-Connected Differential Pair",
+    "12.5.4 Inverter-Based",
+    "12.5.5 Differential-Pair with Floating Voltage Sources"
+]

@@ -1,0 +1,16 @@
+[
+    "CHAPTER 16 Phase-Locked Loops",
+    "16.1.1 Phase Detector",
+    "16.1.2 Basic PLL Topology",
+    "Waveforms in a Locked PLL",
+    "16.1.3 Dynamics of Simple PLL",
+    "16.2.2 Phase/Frequency Detector",
+    "16.2.3 Charge Pump",
+    "16.2.4 Basic Charge-Pump PLL",
+    "16.3.1 PFD/CP Nonidealities",
+    "16.3.2 Jitter in PLLs",
+    "16.4 Delay-Locked Loops",
+    "16.5.1 Frequency Multiplication and Synthesis",
+    "16.5.2 Skew Reduction",
+    "16.5.3 Jitter Reduction"
+]

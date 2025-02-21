@@ -1,0 +1,18 @@
+[
+    "9.1 Introduction",
+    "9.2 Relation Between Gain and Bandwidth in Feedback Amplifiers",
+    "9.3 Instability and the Nyquist Criterion ${ }^{1}$",
+    "9.4.1 Theory of Compensation",
+    "9.4.2 Methods of Compensation",
+    "9.4.3 Two-Stage MOS Amplifier Compensation",
+    "9.4.4 Compensation of Single-Stage CMOS Op Amps",
+    "9.4.5 Nested Miller Compensation",
+    "9.6.1 Origin of Slew-Rate Limitations",
+    "9.6.2 Methods of Improving Slew-Rate in Two-Stage Op Amps",
+    "9.6.3 Improving Slew-Rate in Bipolar Op Amps",
+    "9.6.4 Improving Slew-Rate in MOS Op Amps",
+    "9.6.5 Effect of Slew-Rate Limitations on Large-Signal Sinusoidal Performance",
+    "A.9.1 ANALYSIS IN TERMS OF RETURN-RATIO PARAMETERS",
+    "A.9.2 ROOTS OF A QUADRATIC EQUATION",
+    "REFERENCES"
+]

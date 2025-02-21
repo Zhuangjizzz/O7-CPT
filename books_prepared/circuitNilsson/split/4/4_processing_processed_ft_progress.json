@@ -1,0 +1,16 @@
+[
+    "4.Techniques of Circuit Analysis",
+    "4.1 Terminology",
+    "4.2 Introduction to the Node-Voltage Method",
+    "4.3 The Node-Voltage Method and Dependent Sources",
+    "4.4 The Node-Voltage Method: Some Special Cases",
+    "4.5 Introduction to the Mesh-Current Method",
+    "4.6 The Mesh-Current Method and Dependent Sources",
+    "4.7 The Mesh-Current Method: Some Special Cases",
+    "4.8 The Node-Voltage Method Versus the Mesh-Current Method",
+    "4.9 Source Transformations",
+    "4.10 Thévenin and Norton Equivalents",
+    "4.11 More on Deriving a Thévenin Equivalent",
+    "4.12 Maximum Power Transfer",
+    "4.13 Superposition"
+]
